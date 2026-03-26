@@ -480,11 +480,41 @@ page = st.session_state.page
 
 st.sidebar.markdown("---")
 
-# DRIVE監視状態を表示（バックグラウンドスレッドは使用しない）
-drive_state = ata_drive.load_state()
-last_check_ago = ata_drive.get_last_check_ago()
-pending = drive_state.get("pending_count", 0)
+# DRIVE監視状態を session_state で直接管理
+if "drive_last_check" not in st.session_state:
+    st.session_state.drive_last_check = None
+if "drive_pending" not in st.session_state:
+    st.session_state.drive_pending = 0
+if "drive_check_msg" not in st.session_state:
+    st.session_state.drive_check_msg = None
+if "drive_check_error" not in st.session_state:
+    st.session_state.drive_check_error = None
 
+
+def _format_last_check(iso_str):
+    if not iso_str:
+        return "未実行"
+    try:
+        from datetime import datetime, timezone
+        dt = datetime.fromisoformat(iso_str)
+        now = datetime.now(timezone.utc)
+        delta = now - dt
+        minutes = int(delta.total_seconds() / 60)
+        if minutes < 1:
+            return "たった今"
+        if minutes < 60:
+            return f"{minutes}分前"
+        hours = minutes // 60
+        if hours < 24:
+            return f"{hours}時間前"
+        days = hours // 24
+        return f"{days}日前"
+    except Exception:
+        return "-"
+
+
+last_check_ago = _format_last_check(st.session_state.drive_last_check)
+pending = st.session_state.drive_pending
 badge_cls = "sb-status-badge-warn" if pending > 0 else "sb-status-badge-ok"
 badge_text = f"{pending} 件" if pending > 0 else "0"
 
@@ -502,22 +532,32 @@ st.sidebar.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+# メッセージ表示（前回のチェック結果）
+if st.session_state.drive_check_msg:
+    st.sidebar.success(st.session_state.drive_check_msg)
+    st.session_state.drive_check_msg = None
+if st.session_state.drive_check_error:
+    st.sidebar.error(st.session_state.drive_check_error)
+    st.session_state.drive_check_error = None
+
 if st.sidebar.button("更新", use_container_width=True):
     try:
         with st.sidebar:
             with st.spinner("Drive を確認中..."):
                 result = ata_drive.check_inbox_once()
+        from datetime import datetime, timezone
+        st.session_state.drive_last_check = datetime.now(timezone.utc).isoformat()
         found = result.get("found", 0)
         processed = result.get("processed", 0)
         pending_new = result.get("pending", 0)
+        st.session_state.drive_pending = pending_new
         if found == 0:
-            st.sidebar.success("新規ファイルなし")
+            st.session_state.drive_check_msg = "新規ファイルなし"
         else:
-            st.sidebar.success(f"検出: {found}件 / 処理: {processed}件 / 残: {pending_new}件")
+            st.session_state.drive_check_msg = f"検出: {found}件 / 処理: {processed}件 / 残: {pending_new}件"
     except Exception as e:
         import traceback
-        st.sidebar.error(f"エラー: {e}")
-        st.sidebar.code(traceback.format_exc())
+        st.session_state.drive_check_error = f"エラー: {e}\n\n{traceback.format_exc()}"
     st.rerun()
 
 st.sidebar.markdown("---")

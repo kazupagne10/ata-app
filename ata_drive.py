@@ -44,19 +44,32 @@ _watcher_thread: threading.Thread | None = None
 _watcher_lock = threading.Lock()
 
 
-# ── 状態管理 (Streamlit session_state ベース) ──
+# ── 状態管理 ──
+# Streamlit Cloud ではファイルシステムへの書き込みが不安定なため、
+# モジュールレベルの辞書（_mem_state）をプライマリストアとして使用する。
+# st.session_state は rerun をまたいで値を保持するが、
+# ata_drive モジュールは別スレッドや別コンテキストから呼ばれる可能性があるため、
+# モジュール変数を正とし、session_state は読み取り専用の補助として扱う。
 
 _STATE_KEY = "_ata_drive_state"
 _DEFAULT_STATE = {"last_check": None, "pending_count": 0, "processed": []}
 
+# モジュールレベルのインメモリストア（プロセスが生きている間は保持）
+_mem_state: dict = dict(_DEFAULT_STATE)
+
 
 def load_state() -> dict:
-    """Streamlit session_state から状態を読み込む。フォールバックとしてファイルも試みる。"""
-    # Streamlit 環境の場合: session_state を優先使用
+    """状態を読み込む。優先順位: モジュール変数 > session_state > ファイル"""
+    global _mem_state
+    # モジュール変数に last_check があればそれを返す
+    if _mem_state.get("last_check"):
+        return dict(_mem_state)
+    # session_state を試みる
     try:
         import streamlit as st
         if _STATE_KEY in st.session_state:
-            return st.session_state[_STATE_KEY]
+            _mem_state = dict(st.session_state[_STATE_KEY])
+            return dict(_mem_state)
     except Exception:
         pass
     # ファイルフォールバック
@@ -64,24 +77,21 @@ def load_state() -> dict:
         try:
             with open(DRIVE_STATE_FILE) as f:
                 state = json.load(f)
-                # session_state にキャッシュ
-                try:
-                    import streamlit as st
-                    st.session_state[_STATE_KEY] = state
-                except Exception:
-                    pass
-                return state
+                _mem_state = dict(state)
+                return dict(_mem_state)
         except (json.JSONDecodeError, OSError):
             pass
     return dict(_DEFAULT_STATE)
 
 
 def save_state(state: dict):
-    """Streamlit session_state とファイル両方に保存する。"""
+    """状態を保存する。モジュール変数・session_state・ファイルすべてに書き込む。"""
+    global _mem_state
+    _mem_state = dict(state)
     # session_state に保存
     try:
         import streamlit as st
-        st.session_state[_STATE_KEY] = state
+        st.session_state[_STATE_KEY] = dict(state)
     except Exception:
         pass
     # ファイルにも保存（ローカル環境用）
