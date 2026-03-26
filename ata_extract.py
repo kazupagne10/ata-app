@@ -340,8 +340,19 @@ def write_to_spreadsheet(data: dict):
     ws_trades = sh.worksheet(SHEET_TRADES)
 
     project_id = next_project_id(ws_master)
-    tsubo = data["tsubo"]
-    total = data["total_amount"]
+    # None または 0 の場合に安全に処理
+    tsubo = data.get("tsubo") or None
+    if tsubo is not None:
+        try:
+            tsubo = float(tsubo)
+        except (TypeError, ValueError):
+            tsubo = None
+    total = data.get("total_amount") or None
+    if total is not None:
+        try:
+            total = int(total)
+        except (TypeError, ValueError):
+            total = None
     construction_date = date.today().strftime("%Y-%m")
 
     # 工種別金額を6カテゴリに集計
@@ -359,15 +370,15 @@ def write_to_spreadsheet(data: dict):
     # ── ①案件マスタ に書き込み ──
     master_row = [
         project_id,
-        data["project_name"],
-        data["brand"],
-        data["category"],
+        data.get("project_name", ""),
+        data.get("brand", ""),
+        data.get("category", ""),
         "",  # 工事種別（手入力: 新装/改装）
-        tsubo,
+        tsubo or "",
         construction_date,
-        data["prefecture"],
-        data["station"],
-        total,  # 合計金額
+        data.get("prefecture", ""),
+        data.get("station", ""),
+        total or "",  # 合計金額
         category_amounts["内装"],
         category_amounts["電気"],
         category_amounts["給排水衛生"],
@@ -395,19 +406,27 @@ def write_to_spreadsheet(data: dict):
         mapped = t.get("mapped_category")
         if not mapped:
             continue
-        amt = t["amount"]
+        amt = t.get("amount")
+        if amt is None:
+            try:
+                amt = int(amt)
+            except (TypeError, ValueError):
+                amt = 0
+        amt = amt or 0
+        unit_price = round(amt / tsubo) if tsubo else ""
+        total_unit = round(total / tsubo) if tsubo and total else ""
         trade_rows.append([
             project_id,
-            data["project_name"],
-            data["category"],
-            tsubo,
+            data.get("project_name", ""),
+            data.get("category", ""),
+            tsubo or "",
             mapped,               # 工種
             amt,                   # 金額
-            round(amt / tsubo),    # 坪単価
-            total,                 # 全体合計
-            round(total / tsubo),  # 全体坪単価
+            unit_price,            # 嵪単価
+            total or "",           # 全体合計
+            total_unit,            # 全体嵪単価
             construction_date,
-            t["company"],          # 備考に会社名
+            t.get("company", ""),  # 備考に会社名
             "",                    # ドライブURL
         ])
 
