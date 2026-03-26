@@ -82,13 +82,42 @@ html,body,.stApp,[data-testid="stAppViewContainer"]{
 #MainMenu,footer,[data-testid="stToolbar"]{display:none!important;}
 .main .block-container{padding:2rem 3rem 4rem 3rem!important;max-width:1100px;}
 
+/* ── Fixed top-left title ── */
+.ata-fixed-title{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:9999;
+    background:var(--sb-bg);
+    width:240px;
+    padding:10px 16px 8px 16px;
+    line-height:1.2;
+    pointer-events:none;
+    box-sizing:border-box;
+}
+.ata-fixed-title-name{
+    font-size:0.95rem;
+    font-weight:700;
+    color:#ffffff;
+    letter-spacing:-0.01em;
+    display:block;
+}
+.ata-fixed-title-sub{
+    font-size:0.62rem;
+    color:var(--sb-text-m);
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    display:block;
+    margin-top:1px;
+}
+
 /* ── Sidebar ── */
 section[data-testid="stSidebar"]{
     background:var(--sb-bg)!important;
     border-right:none!important;
     width:240px!important;
 }
-section[data-testid="stSidebar"]>div:first-child{padding:0.5rem 0.6rem 0.4rem 0.6rem!important;}
+section[data-testid="stSidebar"]>div:first-child{padding:52px 0.6rem 0.4rem 0.6rem!important;}
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] .stMarkdown li,
 section[data-testid="stSidebar"] .stMarkdown span{color:var(--sb-text)!important;font-size:0.84rem!important;}
@@ -399,18 +428,22 @@ def render_metric_row(items: list[dict]):
 
 @st.cache_data(ttl=120)
 def load_spreadsheet_data():
-    sh = ata_compare.get_spreadsheet()
-    return ata_compare.load_master(sh), ata_compare.load_trades(sh)
+    try:
+        sh = ata_compare.get_spreadsheet()
+        return ata_compare.load_master(sh), ata_compare.load_trades(sh)
+    except Exception:
+        return [], []
 
 
-# ── Sidebar ──
-
-st.sidebar.markdown("""
-<div class="sb-brand">
-    <div class="sb-brand-name">Apple to Apple</div>
-    <div class="sb-brand-sub">内装工事見積 比較ツール</div>
+# ── Fixed title (top-left, outside sidebar) ──
+st.markdown("""
+<div class="ata-fixed-title">
+    <span class="ata-fixed-title-name">Apple to Apple</span>
+    <span class="ata-fixed-title-sub">内装工事見積 比較ツール</span>
 </div>
 """, unsafe_allow_html=True)
+
+# ── Sidebar ──
 
 # 未入力案件数を事前計算（サイドバーバッジ用）
 @st.cache_data(ttl=120)
@@ -466,13 +499,19 @@ page = st.session_state.page
 
 st.sidebar.markdown("---")
 
-if not ata_drive.is_watcher_running():
-    ata_drive.start_watcher()
+try:
+    if not ata_drive.is_watcher_running():
+        ata_drive.start_watcher()
+except Exception:
+    pass
 
 drive_state = ata_drive.load_state()
 last_check_ago = ata_drive.get_last_check_ago()
 pending = drive_state.get("pending_count", 0)
-watcher_active = ata_drive.is_watcher_running()
+try:
+    watcher_active = ata_drive.is_watcher_running()
+except Exception:
+    watcher_active = False
 
 dot_cls = "sb-status-dot-on" if watcher_active else "sb-status-dot-off"
 badge_cls = "sb-status-badge-warn" if pending > 0 else "sb-status-badge-ok"
