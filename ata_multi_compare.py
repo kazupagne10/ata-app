@@ -13,12 +13,13 @@ import tempfile
 
 import gspread
 import pdfplumber
-from google.oauth2.service_account import Credentials
 from openai import OpenAI
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import get_google_credentials
 
 # ── 設定 ──
 SPREADSHEET_ID = "10uXWjPTuYcMtnvmWt6A9fMWRxvPlVf82vIVpM90u95U"
-CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 
 SHEET_COMPARE = "比較表"
 TRADE_CATEGORIES = ["内装", "電気", "給排水衛生", "空調換気", "ガス", "看板"]
@@ -30,7 +31,7 @@ def get_spreadsheet(readonly: bool = False) -> gspread.Spreadsheet:
     scope = "https://www.googleapis.com/auth/spreadsheets"
     if readonly:
         scope += ".readonly"
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=[scope])
+    creds = get_google_credentials([scope])
     gc = gspread.authorize(creds)
     return gc.open_by_key(SPREADSHEET_ID)
 
@@ -146,7 +147,7 @@ def build_comparison(estimates: list[dict]) -> dict:
 def write_comparison_sheet(project_name: str, tsubo: float, comparison: dict):
     """比較表シートに結果を書き込む"""
     gc_scope = "https://www.googleapis.com/auth/spreadsheets"
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=[gc_scope])
+    creds = get_google_credentials([gc_scope])
     gc = gspread.authorize(creds)
     sh = gc.open_by_key(SPREADSHEET_ID)
 

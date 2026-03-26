@@ -67,3 +67,32 @@ CONSTRUCTION_DAYS_OPTIONS = [
 
 # ── 入札結果 ──
 BID_RESULT_OPTIONS = ["自社受注", "他社受注", "随意契約", "未定"]
+
+
+# ── Google 認証ヘルパー ──
+
+def get_google_credentials(scopes: list):
+    """
+    Streamlit Secrets（本番）または credentials.json（ローカル）から
+    Google サービスアカウント認証情報を取得する。
+    """
+    from google.oauth2.service_account import Credentials
+
+    # Streamlit Cloud 環境: st.secrets に gcp_service_account が存在する場合
+    try:
+        import streamlit as st
+        if "gcp_service_account" in st.secrets:
+            info = dict(st.secrets["gcp_service_account"])
+            return Credentials.from_service_account_info(info, scopes=scopes)
+    except Exception:
+        pass
+
+    # ローカル環境: credentials.json ファイルから読み込む
+    if os.path.exists(CREDENTIALS_FILE):
+        return Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=scopes)
+
+    raise FileNotFoundError(
+        "Google 認証情報が見つかりません。\n"
+        "Streamlit Cloud の Secrets に [gcp_service_account] を設定するか、"
+        "credentials.json をプロジェクトルートに配置してください。"
+    )

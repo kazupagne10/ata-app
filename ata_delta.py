@@ -10,11 +10,12 @@ import os
 import sys
 
 import gspread
-from google.oauth2.service_account import Credentials
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import get_google_credentials
 
 # ── 設定 ──
 SPREADSHEET_ID = "10uXWjPTuYcMtnvmWt6A9fMWRxvPlVf82vIVpM90u95U"
-CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 
 SHEET_MASTER = "案件マスタ"
 SHEET_TRADES = "工種別金額"
@@ -29,7 +30,7 @@ def get_spreadsheet(readonly: bool = False) -> gspread.Spreadsheet:
     scope = "https://www.googleapis.com/auth/spreadsheets"
     if readonly:
         scope += ".readonly"
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=[scope])
+    creds = get_google_credentials([scope])
     gc = gspread.authorize(creds)
     return gc.open_by_key(SPREADSHEET_ID)
 

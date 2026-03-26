@@ -14,12 +14,13 @@ from datetime import date
 
 import gspread
 import pdfplumber
-from google.oauth2.service_account import Credentials
 from openai import OpenAI
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config import get_google_credentials
 
 # ── 設定 ──
 SPREADSHEET_ID = "10uXWjPTuYcMtnvmWt6A9fMWRxvPlVf82vIVpM90u95U"
-CREDENTIALS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "credentials.json")
 
 SHEET_MASTER = "案件マスタ"
 SHEET_TRADES = "工種別金額"
@@ -245,10 +246,8 @@ def get_gspread_client() -> gspread.Client:
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
     ]
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=scopes)
+    creds = get_google_credentials(scopes)
     return gspread.authorize(creds)
-
-
 def _set_dropdown_validation(sh: gspread.Spreadsheet, sheet_id: int, col_index: int, values: list[str]):
     """指定列にプルダウン（データ検証）を設定する"""
     sh.batch_update({"requests": [{

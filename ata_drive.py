@@ -18,7 +18,6 @@ import time
 from datetime import datetime, timezone
 
 import pdfplumber
-from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from openai import OpenAI
@@ -26,11 +25,11 @@ from openai import OpenAI
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ata_extract
 from config import (
-    CREDENTIALS_FILE,
     DRIVE_INBOX_FOLDER_ID,
     DRIVE_POLL_INTERVAL,
     DRIVE_PROCESSED_FOLDER_NAME,
     DRIVE_STATE_FILE,
+    get_google_credentials,
 )
 
 logger = logging.getLogger(__name__)
@@ -91,7 +90,7 @@ def get_last_check_ago() -> str:
 # ── Google Drive API ──
 
 def get_drive_service():
-    creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+    creds = get_google_credentials(SCOPES)
     return build("drive", "v3", credentials=creds)
 
 
