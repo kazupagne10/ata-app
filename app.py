@@ -480,27 +480,17 @@ page = st.session_state.page
 
 st.sidebar.markdown("---")
 
-try:
-    if not ata_drive.is_watcher_running():
-        ata_drive.start_watcher()
-except Exception:
-    pass
-
+# DRIVE監視状態を表示（バックグラウンドスレッドは使用しない）
 drive_state = ata_drive.load_state()
 last_check_ago = ata_drive.get_last_check_ago()
 pending = drive_state.get("pending_count", 0)
-try:
-    watcher_active = ata_drive.is_watcher_running()
-except Exception:
-    watcher_active = False
 
-dot_cls = "sb-status-dot-on" if watcher_active else "sb-status-dot-off"
 badge_cls = "sb-status-badge-warn" if pending > 0 else "sb-status-badge-ok"
 badge_text = f"{pending} 件" if pending > 0 else "0"
 
 st.sidebar.markdown(f"""
 <div class="sb-status">
-    <div class="sb-status-title"><span class="sb-status-dot {dot_cls}"></span>DRIVE 監視</div>
+    <div class="sb-status-title"><span class="sb-status-dot sb-status-dot-on"></span>DRIVE 監視</div>
     <div class="sb-status-row">
         <span class="sb-status-label">最終チェック</span>
         <span class="sb-status-val">{last_check_ago}</span>
@@ -513,19 +503,21 @@ st.sidebar.markdown(f"""
 """, unsafe_allow_html=True)
 
 if st.sidebar.button("更新", use_container_width=True):
-    with st.sidebar:
-        with st.spinner("Drive を確認中..."):
-            try:
+    try:
+        with st.sidebar:
+            with st.spinner("Drive を確認中..."):
                 result = ata_drive.check_inbox_once()
-                found = result.get("found", 0)
-                processed = result.get("processed", 0)
-                pending = result.get("pending", 0)
-                if found == 0:
-                    st.success("新規ファイルなし")
-                else:
-                    st.success(f"検出: {found}件 / 処理: {processed}件 / 残: {pending}件")
-            except Exception as e:
-                st.error(f"エラー: {e}")
+        found = result.get("found", 0)
+        processed = result.get("processed", 0)
+        pending_new = result.get("pending", 0)
+        if found == 0:
+            st.sidebar.success("新規ファイルなし")
+        else:
+            st.sidebar.success(f"検出: {found}件 / 処理: {processed}件 / 残: {pending_new}件")
+    except Exception as e:
+        import traceback
+        st.sidebar.error(f"エラー: {e}")
+        st.sidebar.code(traceback.format_exc())
     st.rerun()
 
 st.sidebar.markdown("---")
