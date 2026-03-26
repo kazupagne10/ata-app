@@ -550,11 +550,26 @@ if st.sidebar.button("更新", use_container_width=True):
         found = result.get("found", 0)
         processed = result.get("processed", 0)
         pending_new = result.get("pending", 0)
+        pairs = result.get("pairs", 0)
+        drawings = result.get("drawings", 0)
+        estimates = result.get("estimates", 0)
+        unknowns = result.get("unknowns", 0)
+        errors = result.get("errors", [])
         st.session_state.drive_pending = pending_new
         if found == 0:
             st.session_state.drive_check_msg = "新規ファイルなし"
-        else:
+        elif processed > 0:
             st.session_state.drive_check_msg = f"検出: {found}件 / 処理: {processed}件 / 残: {pending_new}件"
+        else:
+            # 処理失敗の詳細を表示
+            detail = f"図面: {drawings}件, 見積書: {estimates}件, 不明: {unknowns}件, ペア: {pairs}組"
+            if errors:
+                err_text = " / ".join(errors[:2])  # 最大、2件表示
+                st.session_state.drive_check_error = f"処理失敗: {detail}\nエラー: {err_text}"
+            elif pairs == 0:
+                st.session_state.drive_check_error = f"ペアが見つかりませんでした。{detail}"
+            else:
+                st.session_state.drive_check_error = f"処理失敗。{detail}"
     except Exception as e:
         import traceback
         st.session_state.drive_check_error = f"エラー: {e}\n\n{traceback.format_exc()}"

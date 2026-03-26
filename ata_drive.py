@@ -525,13 +525,20 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
         print(f"[DEBUG]       見積書: {pair['estimate']['name']}")
 
     processed_count = 0
+    pair_errors = []
     for key, pair in pairs.items():
         print(f"[DEBUG]   ペア '{key}' を処理中...")
         try:
             success = process_pair(service, openai_client, pair, processed_id)
             print(f"[DEBUG]     結果: {'成功' if success else '失敗'}")
+            if not success:
+                pair_errors.append(f"{key}: process_pairが False を返しました")
         except Exception as e:
+            import traceback
+            tb = traceback.format_exc()
             print(f"[DEBUG]     例外発生: {type(e).__name__}: {e}")
+            print(f"[DEBUG]     {tb}")
+            pair_errors.append(f"{key}: {type(e).__name__}: {e}")
             success = False
 
         if success:
@@ -555,6 +562,11 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
         "found": len(pdf_files),
         "processed": processed_count,
         "pending": len(remaining),
+        "pairs": len(pairs),
+        "drawings": len(drawings),
+        "estimates": len(estimates),
+        "unknowns": len(unknowns),
+        "errors": pair_errors,
     }
 
 
