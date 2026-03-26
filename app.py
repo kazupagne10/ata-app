@@ -26,7 +26,7 @@ from config import (
 SPREADSHEET_URL = f"https://docs.google.com/spreadsheets/d/{SPREADSHEET_ID}"
 
 st.set_page_config(
-    page_title="Apples to Apples",
+    page_title="Apple to Apple",
     page_icon="A",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -88,13 +88,13 @@ section[data-testid="stSidebar"]{
     border-right:none!important;
     width:240px!important;
 }
-section[data-testid="stSidebar"]>div:first-child{padding:1.2rem 0.8rem!important;}
+section[data-testid="stSidebar"]>div:first-child{padding:0.5rem 0.6rem 0.4rem 0.6rem!important;}
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] .stMarkdown li,
 section[data-testid="stSidebar"] .stMarkdown span{color:var(--sb-text)!important;font-size:0.84rem!important;}
 section[data-testid="stSidebar"] a{color:var(--sb-text-m)!important;text-decoration:none!important;}
 section[data-testid="stSidebar"] a:hover{color:var(--sb-text)!important;}
-section[data-testid="stSidebar"] hr{border-color:var(--sb-border)!important;margin:0.5rem 0!important;}
+section[data-testid="stSidebar"] hr{border-color:var(--sb-border)!important;margin:0.3rem 0!important;}
 
 /* Sidebar nav buttons */
 /* nav-btn / nav-btn-active はボタンの上に重ねて表示するオーバーレイ用 */
@@ -107,15 +107,18 @@ section[data-testid="stSidebar"] .stButton > button {
     border: none !important;
     border-left: 3px solid transparent !important;
     border-radius: 0 6px 6px 0 !important;
-    padding: 9px 14px !important;
+    padding: 6px 12px !important;
     font-weight: 400 !important;
-    font-size: 0.875rem !important;
+    font-size: 0.82rem !important;
     text-align: left !important;
     justify-content: flex-start !important;
     width: 100% !important;
     box-shadow: none !important;
     transition: var(--transition) !important;
-    margin: 1px 0 !important;
+    margin: 0px 0 !important;
+    min-height: 32px !important;
+    height: auto !important;
+    line-height: 1.3 !important;
 }
 section[data-testid="stSidebar"] .stButton > button:hover {
     background: var(--sb-surface) !important;
@@ -125,8 +128,9 @@ section[data-testid="stSidebar"] .stButton > button:hover {
 section[data-testid="stSidebar"] .stButton > button p {
     color: inherit !important;
     text-align: left !important;
-    font-size: 0.875rem !important;
+    font-size: 0.82rem !important;
     margin: 0 !important;
+    line-height: 1.3 !important;
 }
 
 /* サイドバー内の「更新」ボタンは別クラスでスタイリング */
@@ -135,12 +139,13 @@ section[data-testid="stSidebar"] .stButton:last-of-type > button {
     color: var(--sb-text) !important;
     border: 1px solid var(--sb-border) !important;
     border-radius: 6px !important;
-    font-size: 0.8rem !important;
-    padding: 0.35rem 0.8rem !important;
+    font-size: 0.75rem !important;
+    padding: 0.25rem 0.6rem !important;
     box-shadow: none !important;
     justify-content: center !important;
     text-align: center !important;
     border-left: 1px solid var(--sb-border) !important;
+    min-height: 28px !important;
 }
 section[data-testid="stSidebar"] .stButton:last-of-type > button:hover {
     background: #334155 !important;
@@ -288,17 +293,17 @@ hr{border-color:var(--border)!important;}
 .total-card-note{font-size:0.78rem;color:var(--text-muted);margin-top:8px;}
 
 /* ── Sidebar brand ── */
-.sb-brand{padding:4px 12px 12px 12px;}
-.sb-brand-name{font-size:1rem;font-weight:700;color:#ffffff;letter-spacing:-0.01em;}
-.sb-brand-sub{font-size:0.68rem;color:var(--sb-text-m);margin-top:2px;letter-spacing:0.04em;text-transform:uppercase;}
+.sb-brand{padding:2px 8px 8px 8px;}
+.sb-brand-name{font-size:0.95rem;font-weight:700;color:#ffffff;letter-spacing:-0.01em;}
+.sb-brand-sub{font-size:0.65rem;color:var(--sb-text-m);margin-top:1px;letter-spacing:0.04em;text-transform:uppercase;}
 
 /* ── Sidebar status card ── */
-.sb-status{background:var(--sb-surface);border:1px solid var(--sb-border);border-radius:6px;padding:10px 12px;margin:0 4px 4px 4px;}
-.sb-status-title{font-size:0.68rem;font-weight:500;color:var(--sb-text-m);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.sb-status{background:var(--sb-surface);border:1px solid var(--sb-border);border-radius:6px;padding:7px 10px;margin:0 4px 4px 4px;}
+.sb-status-title{font-size:0.65rem;font-weight:500;color:var(--sb-text-m);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:5px;display:flex;align-items:center;gap:6px;}
 .sb-status-dot{width:6px;height:6px;border-radius:50%;display:inline-block;}
 .sb-status-dot-on{background:var(--green);}
 .sb-status-dot-off{background:var(--sb-text-m);}
-.sb-status-row{display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;margin-bottom:3px;}
+.sb-status-row{display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;margin-bottom:2px;}
 .sb-status-row:last-child{margin-bottom:0;}
 .sb-status-label{color:var(--sb-text-m);}
 .sb-status-val{color:var(--sb-text);font-weight:500;}
@@ -307,9 +312,9 @@ hr{border-color:var(--border)!important;}
 .sb-status-badge-warn{background:rgba(192,57,43,0.2);color:#F1948A;}
 
 /* Sidebar link */
-.sb-link{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:6px;color:var(--sb-text-m)!important;text-decoration:none!important;font-size:0.8rem;font-weight:400;transition:var(--transition);}
+.sb-link{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;color:var(--sb-text-m)!important;text-decoration:none!important;font-size:0.75rem;font-weight:400;transition:var(--transition);}
 .sb-link:hover{background:var(--sb-surface);color:var(--sb-text)!important;}
-.sb-footer{font-size:0.68rem;color:var(--sb-text-m);padding:0.5rem 12px;margin-top:0.8rem;border-top:1px solid var(--sb-border);opacity:0.7;}
+.sb-footer{font-size:0.65rem;color:var(--sb-text-m);padding:0.3rem 10px;margin-top:0.4rem;border-top:1px solid var(--sb-border);opacity:0.7;}
 
 /* ── Step Guide ── */
 .step-guide{display:flex;align-items:center;gap:6px;margin-bottom:1.5rem;padding:10px 14px;background:#ffffff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
@@ -402,7 +407,7 @@ def load_spreadsheet_data():
 
 st.sidebar.markdown("""
 <div class="sb-brand">
-    <div class="sb-brand-name">Apples to Apples</div>
+    <div class="sb-brand-name">Apple to Apple</div>
     <div class="sb-brand-sub">内装工事見積 比較ツール</div>
 </div>
 """, unsafe_allow_html=True)
