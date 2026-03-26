@@ -35,12 +35,18 @@ def get_spreadsheet() -> gspread.Spreadsheet:
 # ── データ取得 ──
 
 def _safe_get_all_records(ws: gspread.Worksheet) -> list[dict]:
-    """空白・重複ヘッダーがあっても安全にレコードを取得する"""
+    """空白・重複ヘッダーがあっても安全にレコードを取得する（全列空の行はスキップ）"""
     data = ws.get_all_values()
     if not data:
         return []
     headers = data[0]
-    return [dict(zip(headers, row)) for row in data[1:]]
+    records = []
+    for row in data[1:]:
+        # 行全体が空の場合はスキップ
+        if not any(cell.strip() for cell in row):
+            continue
+        records.append(dict(zip(headers, row)))
+    return records
 
 
 def load_master(sh: gspread.Spreadsheet) -> list[dict]:
