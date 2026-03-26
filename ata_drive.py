@@ -401,12 +401,21 @@ def process_pair(service, openai_client: OpenAI, pair: dict, processed_folder_id
         return True
 
     except Exception as e:
+        import traceback
         logger.error("処理エラー: %s", e, exc_info=True)
-        return False
+        print(f"[DEBUG] process_pair エラー: {type(e).__name__}: {e}")
+        print(f"[DEBUG] {traceback.format_exc()}")
+        raise  # 呼び出し元に伝播して詳細を表示できるようにする
 
     finally:
-        os.unlink(drawing_path)
-        os.unlink(estimate_path)
+        try:
+            os.unlink(drawing_path)
+        except Exception:
+            pass
+        try:
+            os.unlink(estimate_path)
+        except Exception:
+            pass
 
 
 # ── メインチェック ──
