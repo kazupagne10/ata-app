@@ -82,42 +82,13 @@ html,body,.stApp,[data-testid="stAppViewContainer"]{
 #MainMenu,footer,[data-testid="stToolbar"]{display:none!important;}
 .main .block-container{padding:2rem 3rem 4rem 3rem!important;max-width:1100px;}
 
-/* ── Fixed top-left title ── */
-.ata-fixed-title{
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:9999;
-    background:var(--sb-bg);
-    width:240px;
-    padding:10px 16px 8px 16px;
-    line-height:1.2;
-    pointer-events:none;
-    box-sizing:border-box;
-}
-.ata-fixed-title-name{
-    font-size:0.95rem;
-    font-weight:700;
-    color:#ffffff;
-    letter-spacing:-0.01em;
-    display:block;
-}
-.ata-fixed-title-sub{
-    font-size:0.62rem;
-    color:var(--sb-text-m);
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    display:block;
-    margin-top:1px;
-}
-
 /* ── Sidebar ── */
 section[data-testid="stSidebar"]{
     background:var(--sb-bg)!important;
     border-right:none!important;
     width:240px!important;
 }
-section[data-testid="stSidebar"]>div:first-child{padding:52px 0.6rem 0.4rem 0.6rem!important;}
+section[data-testid="stSidebar"]>div:first-child{padding:0.4rem 0.6rem 0.4rem 0.6rem!important;}
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] .stMarkdown li,
 section[data-testid="stSidebar"] .stMarkdown span{color:var(--sb-text)!important;font-size:0.84rem!important;}
@@ -322,7 +293,15 @@ hr{border-color:var(--border)!important;}
 .total-card-note{font-size:0.78rem;color:var(--text-muted);margin-top:8px;}
 
 /* ── Sidebar brand ── */
-.sb-brand{padding:2px 8px 8px 8px;}
+.sb-brand{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:var(--sb-bg);
+    padding:10px 12px 8px 12px;
+    margin:-0.4rem -0.6rem 4px -0.6rem;
+    border-bottom:1px solid var(--sb-border);
+}
 .sb-brand-name{font-size:0.95rem;font-weight:700;color:#ffffff;letter-spacing:-0.01em;}
 .sb-brand-sub{font-size:0.65rem;color:var(--sb-text-m);margin-top:1px;letter-spacing:0.04em;text-transform:uppercase;}
 
@@ -435,15 +414,13 @@ def load_spreadsheet_data():
         return [], []
 
 
-# ── Fixed title (top-left, outside sidebar) ──
-st.markdown("""
-<div class="ata-fixed-title">
-    <span class="ata-fixed-title-name">Apple to Apple</span>
-    <span class="ata-fixed-title-sub">内装工事見積 比較ツール</span>
+# ── Sidebar ──
+st.sidebar.markdown("""
+<div class="sb-brand">
+    <div class="sb-brand-name">Apple to Apple</div>
+    <div class="sb-brand-sub">内装工事見積 比較ツール</div>
 </div>
 """, unsafe_allow_html=True)
-
-# ── Sidebar ──
 
 # 未入力案件数を事前計算（サイドバーバッジ用）
 @st.cache_data(ttl=120)
