@@ -82,6 +82,31 @@ html,body,.stApp,[data-testid="stAppViewContainer"]{
 #MainMenu,footer,[data-testid="stToolbar"]{display:none!important;}
 .main .block-container{padding:2rem 3rem 4rem 3rem!important;max-width:1100px;}
 
+/* ── Sidebar collapse/expand button ── */
+[data-testid="collapsedControl"]{
+    background:#1E293B!important;
+    color:#CBD5E1!important;
+    border:1px solid #334155!important;
+    border-radius:0 6px 6px 0!important;
+    top:12px!important;
+}
+[data-testid="collapsedControl"]:hover{
+    background:#334155!important;
+    color:#ffffff!important;
+}
+[data-testid="collapsedControl"] svg{
+    fill:#CBD5E1!important;
+    stroke:#CBD5E1!important;
+}
+/* サイドバー内の閉じるボタン */
+[data-testid="stSidebarCollapseButton"] button{
+    color:#CBD5E1!important;
+}
+[data-testid="stSidebarCollapseButton"] button:hover{
+    background:#334155!important;
+    color:#ffffff!important;
+}
+
 /* ── Injected fixed title ── */
 #ata-title-fixed{
     position:fixed;
