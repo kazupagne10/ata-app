@@ -88,7 +88,8 @@ section[data-testid="stSidebar"]{
     border-right:none!important;
     width:240px!important;
 }
-section[data-testid="stSidebar"]>div:first-child{padding:0 0.6rem 0.4rem 0.6rem!important;}
+section[data-testid="stSidebar"]>div:first-child{padding:0!important;}
+section[data-testid="stSidebar"] [data-testid="stSidebarContent"]{padding-top:0!important;}
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] .stMarkdown li,
 section[data-testid="stSidebar"] .stMarkdown span{color:var(--sb-text)!important;font-size:0.84rem!important;}
@@ -298,8 +299,7 @@ hr{border-color:var(--border)!important;}
     top:0;
     z-index:100;
     background:var(--sb-bg);
-    padding:14px 12px 8px 12px;
-    margin:0 -0.6rem 4px -0.6rem;
+    padding:12px 14px 8px 14px;
     border-bottom:1px solid var(--sb-border);
 }
 .sb-brand-name{font-size:0.95rem;font-weight:700;color:#ffffff;letter-spacing:-0.01em;}
