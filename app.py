@@ -513,6 +513,19 @@ st.sidebar.markdown(f"""
 """, unsafe_allow_html=True)
 
 if st.sidebar.button("更新", use_container_width=True):
+    with st.sidebar:
+        with st.spinner("Drive を確認中..."):
+            try:
+                result = ata_drive.check_inbox_once()
+                found = result.get("found", 0)
+                processed = result.get("processed", 0)
+                pending = result.get("pending", 0)
+                if found == 0:
+                    st.success("新規ファイルなし")
+                else:
+                    st.success(f"検出: {found}件 / 処理: {processed}件 / 残: {pending}件")
+            except Exception as e:
+                st.error(f"エラー: {e}")
     st.rerun()
 
 st.sidebar.markdown("---")

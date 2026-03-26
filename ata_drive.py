@@ -44,23 +44,54 @@ _watcher_thread: threading.Thread | None = None
 _watcher_lock = threading.Lock()
 
 
-# ── 状態管理 ──
+# ── 状態管理 (Streamlit session_state ベース) ──
+
+_STATE_KEY = "_ata_drive_state"
+_DEFAULT_STATE = {"last_check": None, "pending_count": 0, "processed": []}
+
 
 def load_state() -> dict:
+    """Streamlit session_state から状態を読み込む。フォールバックとしてファイルも試みる。"""
+    # Streamlit 環境の場合: session_state を優先使用
+    try:
+        import streamlit as st
+        if _STATE_KEY in st.session_state:
+            return st.session_state[_STATE_KEY]
+    except Exception:
+        pass
+    # ファイルフォールバック
     if os.path.exists(DRIVE_STATE_FILE):
         try:
             with open(DRIVE_STATE_FILE) as f:
-                return json.load(f)
+                state = json.load(f)
+                # session_state にキャッシュ
+                try:
+                    import streamlit as st
+                    st.session_state[_STATE_KEY] = state
+                except Exception:
+                    pass
+                return state
         except (json.JSONDecodeError, OSError):
             pass
-    return {"last_check": None, "pending_count": 0, "processed": []}
+    return dict(_DEFAULT_STATE)
 
 
 def save_state(state: dict):
-    tmp_path = DRIVE_STATE_FILE + ".tmp"
-    with open(tmp_path, "w") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2)
-    os.replace(tmp_path, DRIVE_STATE_FILE)
+    """Streamlit session_state とファイル両方に保存する。"""
+    # session_state に保存
+    try:
+        import streamlit as st
+        st.session_state[_STATE_KEY] = state
+    except Exception:
+        pass
+    # ファイルにも保存（ローカル環境用）
+    try:
+        tmp_path = DRIVE_STATE_FILE + ".tmp"
+        with open(tmp_path, "w") as f:
+            json.dump(state, f, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, DRIVE_STATE_FILE)
+    except OSError:
+        pass  # Streamlit Cloud では書き込み失敗しても無視
 
 
 def get_last_check_ago() -> str:
