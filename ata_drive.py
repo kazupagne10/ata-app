@@ -420,7 +420,21 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
         service = get_drive_service()
     if openai_client is None:
         print("[DEBUG]   OpenAI client を初期化中...")
-        openai_client = OpenAI()
+        # Streamlit Secrets または環境変数から API キーを取得
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            try:
+                import streamlit as st
+                api_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("openai_api_key")
+            except Exception:
+                pass
+        if api_key:
+            openai_client = OpenAI(api_key=api_key)
+        else:
+            raise ValueError(
+                "OpenAI APIキーが見つかりません。\n"
+                "Streamlit Cloud の Secrets に OPENAI_API_KEY を設定してください。"
+            )
 
     state = load_state()
     print(f"[DEBUG]   現在のstate: pending_count={state.get('pending_count')}")
