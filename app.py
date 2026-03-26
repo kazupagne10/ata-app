@@ -842,17 +842,6 @@ elif page == "類似案件検索":
         load_spreadsheet_data.clear()  # 検索時は必ず最新データを取得
         with st.spinner("スプレッドシートからデータを取得中..."):
             master, trades = load_spreadsheet_data()
-        # デバッグ: 実際に取得したデータの内容を確認
-        try:
-            _sh_dbg = ata_compare.get_spreadsheet()
-            _ws_dbg = _sh_dbg.worksheet("案件マスタ")
-            _raw = _ws_dbg.get_all_values()
-            _total = len(_raw)
-            _non_empty = [r for r in _raw[1:] if any(c.strip() for c in r)]
-            _empty = [r for r in _raw[1:] if not any(c.strip() for c in r)]
-            st.sidebar.info(f"デバッグ: シート総行数={_total}, 非空行={len(_non_empty)}, 空行={len(_empty)}, load_master結果={len(master)}件")
-        except Exception as _e:
-            st.sidebar.warning(f"デバッグ取得失敗: {_e}")
         if not master:
             st.error("案件マスタにデータがありません。")
         else:
