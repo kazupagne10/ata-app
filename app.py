@@ -98,15 +98,26 @@ section[data-testid="stSidebar"] hr{border-color:var(--sb-border)!important;marg
 
 /* Sidebar nav */
 section[data-testid="stSidebar"] [role="radiogroup"]{gap:2px!important;}
+/* ラジオボタンの丸いインジケーターを非表示 */
+section[data-testid="stSidebar"] [role="radiogroup"] label div:first-child{
+    display:none!important;
+}
+section[data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"] p{
+    color:var(--sb-text-m)!important;font-size:0.85rem!important;margin:0!important;text-align:left!important;
+}
 section[data-testid="stSidebar"] [role="radiogroup"] label{
     background:transparent!important;border:none!important;border-left:3px solid transparent!important;
     border-radius:0 6px 6px 0!important;padding:8px 14px!important;
     color:var(--sb-text-m)!important;font-weight:400!important;font-size:0.85rem!important;
     transition:var(--transition)!important;cursor:pointer!important;
     display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    width:100%!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label:hover{
     background:var(--sb-surface)!important;color:var(--sb-text)!important;
+}
+section[data-testid="stSidebar"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p{
+    color:var(--sb-text)!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"],
 section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked){
@@ -114,6 +125,10 @@ section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked){
     color:#ffffff!important;font-weight:600!important;
     box-shadow:none!important;
     border-left:3px solid var(--accent)!important;
+}
+section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"] [data-testid="stMarkdownContainer"] p,
+section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) [data-testid="stMarkdownContainer"] p{
+    color:#ffffff!important;font-weight:600!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label p{
     color:inherit!important;font-size:0.85rem!important;margin:0!important;text-align:left!important;
