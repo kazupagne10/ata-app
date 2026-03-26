@@ -409,7 +409,7 @@ def render_metric_row(items: list[dict]):
     cards = "".join(render_metric_card(**item) for item in items)
     st.markdown(f'<div class="metric-row">{cards}</div>', unsafe_allow_html=True)
 
-@st.cache_data(ttl=120)
+@st.cache_data(ttl=30)
 def load_spreadsheet_data():
     try:
         sh = ata_compare.get_spreadsheet()
@@ -427,7 +427,7 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 
 # 未入力案件数を事前計算（サイドバーバッジ用）
-@st.cache_data(ttl=120)
+@st.cache_data(ttl=30)
 def _count_incomplete():
     try:
         sh = ata_compare.get_spreadsheet()
@@ -839,6 +839,7 @@ elif page == "類似案件検索":
             f_area = st.selectbox("施工エリア", ["指定なし"] + CONSTRUCTION_AREA_OPTIONS, key="f_area")
 
     if st.button("検索する", type="primary", use_container_width=True):
+        load_spreadsheet_data.clear()  # 検索時は必ず最新データを取得
         with st.spinner("スプレッドシートからデータを取得中..."):
             master, trades = load_spreadsheet_data()
         if not master:
