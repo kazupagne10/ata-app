@@ -82,32 +82,12 @@ html,body,.stApp,[data-testid="stAppViewContainer"]{
 #MainMenu,footer,[data-testid="stToolbar"]{display:none!important;}
 .main .block-container{padding:2rem 3rem 4rem 3rem!important;max-width:1100px;}
 
-/* ── Sidebar collapse/expand button (開くボタン) ── */
+/* ── サイドバー開閉ボタンを非表示（常にサイドバーを表示） ── */
 [data-testid="collapsedControl"]{
-    background:#C0392B!important;
-    color:#ffffff!important;
-    border:none!important;
-    border-radius:0 8px 8px 0!important;
-    top:14px!important;
-    width:28px!important;
-    box-shadow:2px 2px 8px rgba(0,0,0,0.25)!important;
+    display:none!important;
 }
-[data-testid="collapsedControl"]:hover{
-    background:#A93226!important;
-    color:#ffffff!important;
-}
-[data-testid="collapsedControl"] svg{
-    fill:#ffffff!important;
-    stroke:#ffffff!important;
-}
-/* サイドバー内の閉じるボタン */
-[data-testid="stSidebarCollapseButton"] button{
-    color:#94A3B8!important;
-    background:transparent!important;
-}
-[data-testid="stSidebarCollapseButton"] button:hover{
-    background:#334155!important;
-    color:#ffffff!important;
+[data-testid="stSidebarCollapseButton"]{
+    display:none!important;
 }
 
 /* ── Sidebar ── */
