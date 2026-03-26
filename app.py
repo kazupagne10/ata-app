@@ -97,41 +97,70 @@ section[data-testid="stSidebar"] a:hover{color:var(--sb-text)!important;}
 section[data-testid="stSidebar"] hr{border-color:var(--sb-border)!important;margin:0.5rem 0!important;}
 
 /* Sidebar nav */
-section[data-testid="stSidebar"] [role="radiogroup"]{gap:2px!important;}
-/* ラジオボタンの丸いインジケーターを非表示 */
-section[data-testid="stSidebar"] [role="radiogroup"] label div:first-child{
-    display:none!important;
+section[data-testid="stSidebar"] [role="radiogroup"]{
+    gap:2px!important;
+    display:flex!important;
+    flex-direction:column!important;
 }
-section[data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"] p{
-    color:var(--sb-text-m)!important;font-size:0.85rem!important;margin:0!important;text-align:left!important;
+/* ラジオボタンのインジケーター（丸）を完全非表示 */
+section[data-testid="stSidebar"] [role="radiogroup"] label > div:first-child,
+section[data-testid="stSidebar"] [role="radiogroup"] label > span:first-child,
+section[data-testid="stSidebar"] [data-baseweb="radio"] > div:first-child,
+section[data-testid="stSidebar"] [data-baseweb="radio"] span[role="radio"],
+section[data-testid="stSidebar"] [role="radiogroup"] input[type="radio"]{
+    display:none!important;
+    width:0!important;
+    height:0!important;
+    position:absolute!important;
+    opacity:0!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label{
-    background:transparent!important;border:none!important;border-left:3px solid transparent!important;
-    border-radius:0 6px 6px 0!important;padding:8px 14px!important;
-    color:var(--sb-text-m)!important;font-weight:400!important;font-size:0.85rem!important;
-    transition:var(--transition)!important;cursor:pointer!important;
-    display:flex!important;align-items:center!important;justify-content:flex-start!important;
+    background:transparent!important;
+    border:none!important;
+    border-left:3px solid transparent!important;
+    border-radius:0 6px 6px 0!important;
+    padding:9px 14px!important;
+    color:var(--sb-text-m)!important;
+    font-weight:400!important;
+    font-size:0.875rem!important;
+    transition:var(--transition)!important;
+    cursor:pointer!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
     width:100%!important;
+    gap:0!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label:hover{
-    background:var(--sb-surface)!important;color:var(--sb-text)!important;
+    background:var(--sb-surface)!important;
+    color:var(--sb-text)!important;
 }
+section[data-testid="stSidebar"] [role="radiogroup"] label:hover p,
 section[data-testid="stSidebar"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p{
     color:var(--sb-text)!important;
 }
 section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"],
 section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked){
     background:var(--sb-surface)!important;
-    color:#ffffff!important;font-weight:600!important;
+    color:#ffffff!important;
+    font-weight:600!important;
     box-shadow:none!important;
     border-left:3px solid var(--accent)!important;
 }
+section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"] p,
 section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"] [data-testid="stMarkdownContainer"] p,
+section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) p,
 section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) [data-testid="stMarkdownContainer"] p{
-    color:#ffffff!important;font-weight:600!important;
+    color:#ffffff!important;
+    font-weight:600!important;
 }
-section[data-testid="stSidebar"] [role="radiogroup"] label p{
-    color:inherit!important;font-size:0.85rem!important;margin:0!important;text-align:left!important;
+section[data-testid="stSidebar"] [role="radiogroup"] label p,
+section[data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"] p{
+    color:inherit!important;
+    font-size:0.875rem!important;
+    margin:0!important;
+    text-align:left!important;
+    line-height:1.4!important;
 }
 
 /* Sidebar button override */
