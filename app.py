@@ -107,45 +107,13 @@ html,body,.stApp,[data-testid="stAppViewContainer"]{
     color:#ffffff!important;
 }
 
-/* ── Injected fixed title ── */
-#ata-title-fixed{
-    position:fixed;
-    top:0;
-    left:0;
-    z-index:99999;
-    background:#0F172A;
-    width:240px;
-    padding:10px 14px 8px 14px;
-    box-sizing:border-box;
-    border-bottom:1px solid #334155;
-    pointer-events:none;
-}
-#ata-title-fixed .t-name{
-    display:block;
-    font-size:0.95rem;
-    font-weight:700;
-    color:#ffffff;
-    letter-spacing:-0.01em;
-    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-}
-#ata-title-fixed .t-sub{
-    display:block;
-    font-size:0.62rem;
-    color:#94A3B8;
-    letter-spacing:0.04em;
-    text-transform:uppercase;
-    margin-top:1px;
-    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
-}
-
 /* ── Sidebar ── */
 section[data-testid="stSidebar"]{
     background:var(--sb-bg)!important;
     border-right:none!important;
     width:240px!important;
 }
-section[data-testid="stSidebar"]>div:first-child{padding:0!important;}
-section[data-testid="stSidebar"] [data-testid="stSidebarContent"]{padding-top:0!important;}
+section[data-testid="stSidebar"]>div:first-child{padding:0.5rem 0.6rem!important;}
 section[data-testid="stSidebar"] .stMarkdown p,
 section[data-testid="stSidebar"] .stMarkdown li,
 section[data-testid="stSidebar"] .stMarkdown span{color:var(--sb-text)!important;font-size:0.84rem!important;}
@@ -349,10 +317,10 @@ hr{border-color:var(--border)!important;}
 .total-card-value{font-size:2.2rem;font-weight:700;color:var(--text);letter-spacing:-0.03em;}
 .total-card-note{font-size:0.78rem;color:var(--text-muted);margin-top:8px;}
 
-/* ── Sidebar brand (hidden — replaced by injected fixed title) ── */
-.sb-brand{display:none!important;}
-.sb-brand-name{display:none!important;}
-.sb-brand-sub{display:none!important;}
+/* ── Sidebar brand ── */
+.sb-brand{padding:8px 12px 8px 12px;border-bottom:1px solid var(--sb-border);margin-bottom:4px;}
+.sb-brand-name{font-size:0.95rem;font-weight:700;color:#ffffff;letter-spacing:-0.01em;display:block;}
+.sb-brand-sub{font-size:0.65rem;color:var(--sb-text-m);margin-top:1px;letter-spacing:0.04em;text-transform:uppercase;display:block;}
 
 /* ── Sidebar status card ── */
 .sb-status{background:var(--sb-surface);border:1px solid var(--sb-border);border-radius:6px;padding:7px 10px;margin:0 4px 4px 4px;}
@@ -419,30 +387,7 @@ hr{border-color:var(--border)!important;}
 
 st.markdown(CUSTOM_CSS, unsafe_allow_html=True)
 
-# ── Inject fixed title via JS ──
-st.markdown("""
-<script>
-(function(){
-    function injectTitle(){
-        if(document.getElementById('ata-title-fixed')) return;
-        var el = document.createElement('div');
-        el.id = 'ata-title-fixed';
-        el.innerHTML = '<span class="t-name">Apple to Apple</span><span class="t-sub">内装工事見積 比較ツール</span>';
-        document.body.appendChild(el);
-    }
-    if(document.readyState === 'loading'){
-        document.addEventListener('DOMContentLoaded', injectTitle);
-    } else {
-        injectTitle();
-    }
-    // Streamlitは再レンダリングするため、MutationObserverで常に維持
-    var observer = new MutationObserver(function(){
-        if(!document.getElementById('ata-title-fixed')) injectTitle();
-    });
-    observer.observe(document.body, {childList: true, subtree: false});
-})();
-</script>
-""", unsafe_allow_html=True)
+
 
 
 # ── Helpers ──
