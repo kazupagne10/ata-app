@@ -96,82 +96,55 @@ section[data-testid="stSidebar"] a{color:var(--sb-text-m)!important;text-decorat
 section[data-testid="stSidebar"] a:hover{color:var(--sb-text)!important;}
 section[data-testid="stSidebar"] hr{border-color:var(--sb-border)!important;margin:0.5rem 0!important;}
 
-/* Sidebar nav */
-section[data-testid="stSidebar"] [role="radiogroup"]{
-    gap:2px!important;
-    display:flex!important;
-    flex-direction:column!important;
+/* Sidebar nav buttons */
+/* nav-btn / nav-btn-active はボタンの上に重ねて表示するオーバーレイ用 */
+.nav-btn, .nav-btn-active { display:none!important; }
+
+/* サイドバー内のボタンをナビゲーションリンク風にスタイリング */
+section[data-testid="stSidebar"] .stButton > button {
+    background: transparent !important;
+    color: var(--sb-text-m) !important;
+    border: none !important;
+    border-left: 3px solid transparent !important;
+    border-radius: 0 6px 6px 0 !important;
+    padding: 9px 14px !important;
+    font-weight: 400 !important;
+    font-size: 0.875rem !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    transition: var(--transition) !important;
+    margin: 1px 0 !important;
 }
-/* ラジオボタンのインジケーター（丸）を完全非表示 */
-section[data-testid="stSidebar"] [role="radiogroup"] label > div:first-child,
-section[data-testid="stSidebar"] [role="radiogroup"] label > span:first-child,
-section[data-testid="stSidebar"] [data-baseweb="radio"] > div:first-child,
-section[data-testid="stSidebar"] [data-baseweb="radio"] span[role="radio"],
-section[data-testid="stSidebar"] [role="radiogroup"] input[type="radio"]{
-    display:none!important;
-    width:0!important;
-    height:0!important;
-    position:absolute!important;
-    opacity:0!important;
+section[data-testid="stSidebar"] .stButton > button:hover {
+    background: var(--sb-surface) !important;
+    color: var(--sb-text) !important;
+    border-left: 3px solid transparent !important;
 }
-section[data-testid="stSidebar"] [role="radiogroup"] label{
-    background:transparent!important;
-    border:none!important;
-    border-left:3px solid transparent!important;
-    border-radius:0 6px 6px 0!important;
-    padding:9px 14px!important;
-    color:var(--sb-text-m)!important;
-    font-weight:400!important;
-    font-size:0.875rem!important;
-    transition:var(--transition)!important;
-    cursor:pointer!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:flex-start!important;
-    width:100%!important;
-    gap:0!important;
-}
-section[data-testid="stSidebar"] [role="radiogroup"] label:hover{
-    background:var(--sb-surface)!important;
-    color:var(--sb-text)!important;
-}
-section[data-testid="stSidebar"] [role="radiogroup"] label:hover p,
-section[data-testid="stSidebar"] [role="radiogroup"] label:hover [data-testid="stMarkdownContainer"] p{
-    color:var(--sb-text)!important;
-}
-section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"],
-section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked){
-    background:var(--sb-surface)!important;
-    color:#ffffff!important;
-    font-weight:600!important;
-    box-shadow:none!important;
-    border-left:3px solid var(--accent)!important;
-}
-section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"] p,
-section[data-testid="stSidebar"] [role="radiogroup"] label[data-checked="true"] [data-testid="stMarkdownContainer"] p,
-section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) p,
-section[data-testid="stSidebar"] [role="radiogroup"] label:has(input:checked) [data-testid="stMarkdownContainer"] p{
-    color:#ffffff!important;
-    font-weight:600!important;
-}
-section[data-testid="stSidebar"] [role="radiogroup"] label p,
-section[data-testid="stSidebar"] [role="radiogroup"] [data-testid="stMarkdownContainer"] p{
-    color:inherit!important;
-    font-size:0.875rem!important;
-    margin:0!important;
-    text-align:left!important;
-    line-height:1.4!important;
+section[data-testid="stSidebar"] .stButton > button p {
+    color: inherit !important;
+    text-align: left !important;
+    font-size: 0.875rem !important;
+    margin: 0 !important;
 }
 
-/* Sidebar button override */
-section[data-testid="stSidebar"] .stButton>button{
-    background:var(--sb-surface)!important;color:var(--sb-text)!important;
-    border:1px solid var(--sb-border)!important;border-radius:6px!important;
-    font-size:0.8rem!important;padding:0.35rem 0.8rem!important;
-    box-shadow:none!important;
+/* サイドバー内の「更新」ボタンは別クラスでスタイリング */
+section[data-testid="stSidebar"] .stButton:last-of-type > button {
+    background: var(--sb-surface) !important;
+    color: var(--sb-text) !important;
+    border: 1px solid var(--sb-border) !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    padding: 0.35rem 0.8rem !important;
+    box-shadow: none !important;
+    justify-content: center !important;
+    text-align: center !important;
+    border-left: 1px solid var(--sb-border) !important;
 }
-section[data-testid="stSidebar"] .stButton>button:hover{
-    background:#334155!important;color:#ffffff!important;
+section[data-testid="stSidebar"] .stButton:last-of-type > button:hover {
+    background: #334155 !important;
+    color: #ffffff !important;
 }
 
 /* ── Page Header ── */
@@ -463,19 +436,28 @@ def _count_incomplete():
 _incomplete_count = _count_incomplete()
 _incomplete_badge = f" ({_incomplete_count}件)" if _incomplete_count > 0 else ""
 
-page = st.sidebar.radio(
-    "Nav",
-    ["PDF抽出", "類似案件検索", "増減表作成", "複数社比較", "入札分析", "未入力補完"],
-    format_func=lambda x: {
-        "PDF抽出":     "PDF 抽出",
-        "類似案件検索": "類似案件検索",
-        "増減表作成":   "増減表作成",
-        "複数社比較":   "複数社比較",
-        "入札分析":     "入札分析",
-        "未入力補完":   f"未入力案件の補完{_incomplete_badge}",
-    }[x],
-    label_visibility="collapsed",
-)
+# ── ナビゲーション（ボタン方式）──
+if "page" not in st.session_state:
+    st.session_state.page = "PDF抽出"
+
+nav_items = [
+    ("PDF抽出",     "PDF 抽出"),
+    ("類似案件検索", "類似案件検索"),
+    ("増減表作成",   "増減表作成"),
+    ("複数社比較",   "複数社比較"),
+    ("入札分析",     "入札分析"),
+    ("未入力補完",   f"未入力案件の補完{_incomplete_badge}"),
+]
+
+for key, label in nav_items:
+    is_active = st.session_state.page == key
+    active_class = "nav-btn-active" if is_active else "nav-btn"
+    st.sidebar.markdown(f'<div class="{active_class}" id="nav-{key}">{label}</div>', unsafe_allow_html=True)
+    if st.sidebar.button(label, key=f"nav_{key}", use_container_width=True):
+        st.session_state.page = key
+        st.rerun()
+
+page = st.session_state.page
 
 st.sidebar.markdown("---")
 
