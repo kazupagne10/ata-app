@@ -422,12 +422,22 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
         print("[DEBUG]   OpenAI client を初期化中...")
         # Streamlit Secrets または環境変数から API キーを取得
         api_key = os.environ.get("OPENAI_API_KEY")
+        print(f"[DEBUG]   OPENAI_API_KEY from env: {'found' if api_key else 'not found'}")
         if not api_key:
             try:
                 import streamlit as st
-                api_key = st.secrets.get("OPENAI_API_KEY") or st.secrets.get("openai_api_key")
-            except Exception:
-                pass
+                # Secrets の全キーをデバッグ表示
+                all_keys = list(st.secrets.keys())
+                print(f"[DEBUG]   st.secrets keys: {all_keys}")
+                # トップレベルで検索
+                api_key = (
+                    st.secrets.get("OPENAI_API_KEY")
+                    or st.secrets.get("openai_api_key")
+                    or st.secrets.get("openai", {}).get("api_key")
+                )
+                print(f"[DEBUG]   api_key from secrets: {'found' if api_key else 'not found'}")
+            except Exception as e:
+                print(f"[DEBUG]   secrets error: {e}")
         if api_key:
             openai_client = OpenAI(api_key=api_key)
         else:
