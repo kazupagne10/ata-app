@@ -1,0 +1,25 @@
+# 認証情報（絶対にGitHubにアップしない）
+credentials.json
+drive_state.json
+
+# パッチスクリプト（不要）
+patch_css.py
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+nohup.out
