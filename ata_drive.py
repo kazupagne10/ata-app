@@ -435,6 +435,13 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
                     or st.secrets.get("openai_api_key")
                     or st.secrets.get("openai", {}).get("api_key")
                 )
+                # gcp_service_account セクション内に書かれている場合も対応
+                if not api_key:
+                    gcp = st.secrets.get("gcp_service_account", {})
+                    api_key = (
+                        gcp.get("OPENAI_API_KEY")
+                        or gcp.get("openai_api_key")
+                    )
                 print(f"[DEBUG]   api_key from secrets: {'found' if api_key else 'not found'}")
             except Exception as e:
                 print(f"[DEBUG]   secrets error: {e}")
