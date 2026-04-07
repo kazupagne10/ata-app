@@ -30,6 +30,7 @@ from config import (
     DRIVE_PROCESSED_FOLDER_NAME,
     DRIVE_STATE_FILE,
     get_google_credentials,
+    get_openai_client,
 )
 
 logger = logging.getLogger(__name__)
@@ -428,39 +429,7 @@ def check_inbox_once(service=None, openai_client=None) -> dict:
         print("[DEBUG]   Drive service を初期化中...")
         service = get_drive_service()
     if openai_client is None:
-        print("[DEBUG]   OpenAI client を初期化中...")
-        # Streamlit Secrets または環境変数から API キーを取得
-        api_key = os.environ.get("OPENAI_API_KEY")
-        print(f"[DEBUG]   OPENAI_API_KEY from env: {'found' if api_key else 'not found'}")
-        if not api_key:
-            try:
-                import streamlit as st
-                # Secrets の全キーをデバッグ表示
-                all_keys = list(st.secrets.keys())
-                print(f"[DEBUG]   st.secrets keys: {all_keys}")
-                # トップレベルで検索
-                api_key = (
-                    st.secrets.get("OPENAI_API_KEY")
-                    or st.secrets.get("openai_api_key")
-                    or st.secrets.get("openai", {}).get("api_key")
-                )
-                # gcp_service_account セクション内に書かれている場合も対応
-                if not api_key:
-                    gcp = st.secrets.get("gcp_service_account", {})
-                    api_key = (
-                        gcp.get("OPENAI_API_KEY")
-                        or gcp.get("openai_api_key")
-                    )
-                print(f"[DEBUG]   api_key from secrets: {'found' if api_key else 'not found'}")
-            except Exception as e:
-                print(f"[DEBUG]   secrets error: {e}")
-        if api_key:
-            openai_client = OpenAI(api_key=api_key)
-        else:
-            raise ValueError(
-                "OpenAI APIキーが見つかりません。\n"
-                "Streamlit Cloud の Secrets に OPENAI_API_KEY を設定してください。"
-            )
+        openai_client = get_openai_client()
 
     state = load_state()
     print(f"[DEBUG]   現在のstate: pending_count={state.get('pending_count')}")
@@ -591,7 +560,7 @@ def _watcher_loop():
     logger.info("バックグラウンド監視を開始（間隔: %d秒）", DRIVE_POLL_INTERVAL)
 
     service = get_drive_service()
-    openai_client = OpenAI()
+    openai_client = get_openai_client()
 
     while True:
         try:

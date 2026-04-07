@@ -16,7 +16,7 @@ import pdfplumber
 from openai import OpenAI
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from config import get_google_credentials
+from config import get_google_credentials, get_openai_client
 
 # ── 設定 ──
 SPREADSHEET_ID = "10uXWjPTuYcMtnvmWt6A9fMWRxvPlVf82vIVpM90u95U"
@@ -259,7 +259,7 @@ def main():
     parser.add_argument("--no-write", action="store_true", help="スプレッドシートに書き込まない")
     args = parser.parse_args()
 
-    openai_client = OpenAI()
+    openai_client = get_openai_client()
     estimates = []
 
     for pdf_path in args.pdfs:

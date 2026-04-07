@@ -17,7 +17,7 @@ import pdfplumber
 from openai import OpenAI
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from config import get_google_credentials
+from config import get_google_credentials, get_openai_client
 
 # ── 設定 ──
 SPREADSHEET_ID = "10uXWjPTuYcMtnvmWt6A9fMWRxvPlVf82vIVpM90u95U"
@@ -544,7 +544,7 @@ def main():
     print("GPT-4oでデータを解析中...")
     print()
 
-    client = OpenAI()
+    client = get_openai_client()
     data = extract_with_gpt4o(client, drawing_text, estimate_text)
 
     display_results(data)

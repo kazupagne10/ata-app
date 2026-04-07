@@ -628,8 +628,8 @@ if page == "PDF抽出":
                     drawing_text = ata_extract.extract_text_from_pdf(drawing_path, max_pages=5)
                     estimate_text = ata_extract.extract_text_from_pdf(estimate_path, max_pages=3)
                     st.write("GPT-4oでデータを解析中...")
-                    from openai import OpenAI
-                    client = OpenAI()
+                    from config import get_openai_client
+                    client = get_openai_client()
                     data = ata_extract.extract_with_gpt4o(client, drawing_text, estimate_text)
                     st.write("スプレッドシートに書き込み中...")
                     ata_extract.write_to_spreadsheet(data)
@@ -1176,8 +1176,8 @@ elif page == "複数社比較":
         write_to_sheet = st.checkbox("スプレッドシートの「比較表」にも書き込む", value=True, key="mc_write")
         btn_label = f"{len(uploaded_files)}社を比較する"
         if st.button(btn_label, type="primary", use_container_width=True, key="mc_run"):
-            from openai import OpenAI
-            openai_client = OpenAI()
+            from config import get_openai_client
+            openai_client = get_openai_client()
             estimates, temp_paths = [], []
             with st.status("見積書を解析中...", expanded=True) as status:
                 for i, uf in enumerate(uploaded_files):

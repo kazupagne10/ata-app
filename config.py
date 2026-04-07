@@ -69,6 +69,44 @@ CONSTRUCTION_DAYS_OPTIONS = [
 BID_RESULT_OPTIONS = ["自社受注", "他社受注", "随意契約", "未定"]
 
 
+# ── OpenAI ヘルパー ──
+
+def get_openai_client():
+    """
+    Streamlit Secrets（本番）または環境変数（ローカル）から
+    OpenAI クライアントを生成する。
+    Secrets の OPENAI_API_KEY はトップレベルまたは
+    [gcp_service_account] セクション内のどちらにあっても対応する。
+    """
+    from openai import OpenAI
+
+    api_key = None
+
+    # Streamlit Cloud 環境
+    try:
+        import streamlit as st
+        # トップレベルにある場合
+        if "OPENAI_API_KEY" in st.secrets:
+            api_key = st.secrets["OPENAI_API_KEY"]
+        # [gcp_service_account] セクション内にある場合
+        elif "gcp_service_account" in st.secrets and "OPENAI_API_KEY" in st.secrets["gcp_service_account"]:
+            api_key = st.secrets["gcp_service_account"]["OPENAI_API_KEY"]
+    except Exception:
+        pass
+
+    # ローカル環境: 環境変数から取得
+    if not api_key:
+        api_key = os.environ.get("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError(
+            "OpenAI APIキーが見つかりません。\n"
+            "Streamlit Cloud の Secrets に OPENAI_API_KEY を設定してください。"
+        )
+
+    return OpenAI(api_key=api_key)
+
+
 # ── Google 認証ヘルパー ──
 
 def get_google_credentials(scopes: list):
