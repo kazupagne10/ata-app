@@ -658,13 +658,24 @@ if page == "PDF抽出":
             {"label": "全体坪単価", "value": f"{fmt_yen(total / tsubo)}/坪"},
         ])
 
-        st.markdown(f"""
-        <div class="info-bar">
-            <div class="info-bar-item"><span class="info-bar-label">ブランド</span><span class="tag tag-accent">{data['brand']}</span></div>
-            <div class="info-bar-item"><span class="info-bar-label">業態</span><span class="tag tag-green">{data['category']}</span></div>
-            <div class="info-bar-item"><span class="info-bar-label">所在地</span><span class="info-bar-value">{data['prefecture']}（{data['station']}）</span></div>
-        </div>
-        """, unsafe_allow_html=True)
+        from config import GYOTAI_OPTIONS as _GYOTAI
+        _info_col1, _info_col2, _info_col3 = st.columns([2, 2, 3])
+        with _info_col1:
+            st.markdown('<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">ブランド</div>', unsafe_allow_html=True)
+            st.markdown(f'<span class="tag tag-accent">{data["brand"]}</span>', unsafe_allow_html=True)
+        with _info_col2:
+            _cat_default = data['category'] if data['category'] in _GYOTAI else _GYOTAI[0]
+            _cat_idx = _GYOTAI.index(_cat_default)
+            edited_category = st.selectbox(
+                "業態（修正可）",
+                options=_GYOTAI,
+                index=_cat_idx,
+                key="edit_category",
+                help="GPT-4oの判断が誤っている場合はここで修正してください"
+            )
+        with _info_col3:
+            st.markdown('<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">所在地</div>', unsafe_allow_html=True)
+            st.markdown(f'<span class="info-bar-value">{data["prefecture"]}（{data["station"]}）</span>', unsafe_allow_html=True)
 
         render_section("工種別内訳")
         trade_rows = []
@@ -769,6 +780,15 @@ if page == "PDF抽出":
                 project_id = all_ids[-1] if all_ids else "P-001"
 
                 ata_extract.write_conditions_to_spreadsheet(project_id, data["project_name"], edited_conditions)
+
+                # 業態の変更をスプレッドシートに反映
+                _edited_cat = st.session_state.get("edit_category", data.get("category", ""))
+                if _edited_cat and _edited_cat != data.get("category", ""):
+                    _master_headers = ws.row_values(1)
+                    if "業態" in _master_headers:
+                        _cat_col = _master_headers.index("業態") + 1
+                        _cat_row = len([v for v in ws.col_values(1) if v])
+                        ws.update_cell(_cat_row, _cat_col, _edited_cat)
 
                 # 追加項目の保存（工事条件フォームの値を案件マスタに書き込み）
                 _add_headers = ws.row_values(1)
