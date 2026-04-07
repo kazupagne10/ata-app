@@ -40,12 +40,18 @@ def _safe_get_all_records(ws: gspread.Worksheet) -> list[dict]:
     if not data:
         return []
     headers = data[0]
+    # ヘッダー行が空の場合は空リストを返す
+    if not any(h.strip() for h in headers):
+        return []
     records = []
     for row in data[1:]:
         # 行全体が空の場合はスキップ
         if not any(cell.strip() for cell in row):
             continue
-        records.append(dict(zip(headers, row)))
+        # 行の長さがヘッダーより短い場合はパディング
+        padded_row = row + [""] * (len(headers) - len(row))
+        record = dict(zip(headers, padded_row))
+        records.append(record)
     return records
 
 

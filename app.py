@@ -413,8 +413,13 @@ def render_metric_row(items: list[dict]):
 def load_spreadsheet_data():
     try:
         sh = ata_compare.get_spreadsheet()
-        return ata_compare.load_master(sh), ata_compare.load_trades(sh)
-    except Exception:
+        master = ata_compare.load_master(sh)
+        trades = ata_compare.load_trades(sh)
+        return master, trades
+    except Exception as e:
+        # エラーをsession_stateに保存してUIに表示できるようにする
+        import streamlit as _st
+        _st.session_state["_load_error"] = str(e)
         return [], []
 
 
@@ -747,12 +752,15 @@ if page == "PDF抽出":
                 with col:
                     st.markdown(f'<div class="{bg_cls}"><span class="cond-label">{label}</span><span class="cond-badge {badge_cls}">{conf.upper()}</span></div>', unsafe_allow_html=True)
                     if choices:
-                        options = ["（未選択）"] + list(choices)
+                        options = ["(未選択)"] + list(choices)
+                        # 照明器具支給はデフォルトを「なし」に設定
+                        if key == "lighting_supply" and not val:
+                            val = "なし"
                         default_idx = 0
                         if val in choices:
                             default_idx = list(choices).index(val) + 1
                         selected = st.selectbox(label, options, index=default_idx, key=f"cond_{key}", label_visibility="collapsed")
-                        edited_conditions[key] = "" if selected == "（未選択）" else selected
+                        edited_conditions[key] = "" if selected == "(未選択)" else selected
                     else:
                         edited_conditions[key] = st.text_input(label, value=val, key=f"cond_{key}", label_visibility="collapsed")
 
@@ -870,8 +878,11 @@ elif page == "類似案件検索":
         load_spreadsheet_data.clear()  # 検索時は必ず最新データを取得
         with st.spinner("スプレッドシートからデータを取得中..."):
             master, trades = load_spreadsheet_data()
+        if "_load_error" in st.session_state:
+            st.error(f"スプレッドシートの読み込みエラー: {st.session_state['_load_error']}")
+            del st.session_state["_load_error"]
         if not master:
-            st.error("案件マスタにデータがありません。")
+            st.error("案件マスタにデータがありません。スプレッドシートにデータを登録してから再検索してください。")
         else:
             # 工事条件でフィルタリング（案件サマリーシートがあれば）
             cond_data = {}
@@ -955,7 +966,12 @@ elif page == "類似案件検索":
                     return 999999
             sorted_master = sorted(filtered_master, key=_tsubo_diff)
 
+            # 案件IDが空のレコードを除外
+            sorted_master = [p for p in sorted_master if p.get("案件ID", "").strip()]
+
             render_section("過去案件一覧（坪数が近い順）")
+            if not sorted_master:
+                st.info("過去案件が見つかりませんでした。まずPDF抽出で案件を登録してください。")
             table_rows = []
             for p in sorted_master:
                 total_val = p.get("合計金額（税抜）", 0)

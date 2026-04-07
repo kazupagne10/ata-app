@@ -124,8 +124,9 @@ def extract_with_gpt4o(client: OpenAI, drawing_text: str, estimate_text: str) ->
     - grease_trap (グリストラップあり): グリストラップの新設・設置が含まれていればTrue
     - exterior_sign (外部サイン工事あり): 外部サイン・ファサードサイン工事が含まれていればTrue
 
-11. **outdoor_unit_floor**: 室外機の設置場所。以下から選択: 屋上, 地下, 同一階（店内）, 屋外地上, その他, 未記入
+11. **outdoor_unit_floor**: 室外機の設置場所。以下から選択: 屋上, 地下, 屋外地上, その他, 未記入
     図面や見積書から室外機の設置場所が読み取れる場合は選択し、不明なら"未記入"。
+    「屋外地上」は屋外に地上設置する場合を指す（店内に室外機が設置されることはない）。
 12. **construction_days**: 工期。着工〜竣工の期間。以下から選択:
     未記入, 〜15日, 16〜30日, 31〜45日, 46〜60日, 61日〜
 13. **construction_area**: 施工エリア。都道府県情報から推定。以下から選択:
@@ -167,7 +168,7 @@ def extract_with_gpt4o(client: OpenAI, drawing_text: str, estimate_text: str) ->
     "grease_trap": true/false,
     "exterior_sign": true/false
   }},
-  "outdoor_unit_floor": "屋上 or 地下 or 同一階（店内） or 屋外地上 or その他 or 未記入",
+  "outdoor_unit_floor": "屋上 or 地下 or 屋外地上 or その他 or 未記入",
   "construction_days": "〜15日 or 16〜30日 or 31〜45日 or 46〜60日 or 61日〜 or 未記入",
   "construction_area": "一都三県 or 北関東 or 北海道・東北 or 中部 or 近畿 or 中国・四国 or 九州 or 未記入",
   "remarks_extra": "特記事項（なければ空文字）",
