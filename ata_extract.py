@@ -271,31 +271,47 @@ def _set_dropdown_validation(sh: gspread.Spreadsheet, sheet_id: int, col_index: 
     }]})
 
 
+# 案件マスタの期待ヘッダー一覧
+MASTER_HEADERS = [
+    "案件ID", "案件名", "ブランド名", "業態", "工事種別", "坪数",
+    "施工年月", "都道府県", "最寄り駅",
+    "合計金額（税抜）",
+    "内装", "電気", "給排水衛生", "空調換気", "ガス", "看板",
+    "客席数", "厨房有無", "ドライブURL",
+    "防水工事あり", "厨房フード工事あり", "看板工事あり",
+    "グリストラップあり", "外部サイン工事あり",
+    "入札結果", "他社受注金額", "他社受注坪単価",
+    "室外機設置階数", "工期（日数）", "施工エリア", "その他備考",
+]
+
+
 def ensure_sheets(sh: gspread.Spreadsheet):
     """必要なシートがなければ作成し、ヘッダーを書き込む"""
     existing = {ws.title for ws in sh.worksheets()}
 
     # ①案件マスタ
     if SHEET_MASTER not in existing:
-        ws = sh.add_worksheet(title=SHEET_MASTER, rows=200, cols=20)
-        ws.append_row([
-            "案件ID", "案件名", "ブランド名", "業態", "工事種別", "坪数",
-            "施工年月", "都道府県", "最寄り駅",
-            "合計金額（税抜）",
-            "内装", "電気", "給排水衛生", "空調換気", "ガス", "看板",
-            "客席数", "厨房有無", "ドライブURL",
-            "防水工事あり", "厨房フード工事あり", "看板工事あり",
-            "グリストラップあり", "外部サイン工事あり",
-            "入札結果", "他社受注金額", "他社受注坪単価",
-            "室外機設置階数", "工期（日数）", "施工エリア", "その他備考",
-        ])
-        ws.format("A1:AA1", {"textFormat": {"bold": True}})
+        ws = sh.add_worksheet(title=SHEET_MASTER, rows=200, cols=len(MASTER_HEADERS) + 5)
+        ws.append_row(MASTER_HEADERS)
+        ws.format(f"A1:{chr(64 + len(MASTER_HEADERS))}1", {"textFormat": {"bold": True}})
         # 工事種別列（E列）にデータ検証（新装/改装のプルダウン）を設定
         _set_dropdown_validation(sh, ws.id, col_index=4, values=["新装", "改装"])
-        # 入札結果列（Z列=col 25）にプルダウン設定
+        # 入札結果列にプルダウン設定
         from config import BID_RESULT_OPTIONS
-        _set_dropdown_validation(sh, ws.id, col_index=25, values=BID_RESULT_OPTIONS)
+        bid_col_idx = MASTER_HEADERS.index("入札結果") if "入札結果" in MASTER_HEADERS else 25
+        _set_dropdown_validation(sh, ws.id, col_index=bid_col_idx, values=BID_RESULT_OPTIONS)
         print(f"  シート「{SHEET_MASTER}」を作成しました")
+    else:
+        # 既存シートのヘッダーを確認し、不足列があれば追加する
+        ws = sh.worksheet(SHEET_MASTER)
+        current_headers = ws.row_values(1)
+        missing = [h for h in MASTER_HEADERS if h not in current_headers]
+        if missing:
+            # 末尾に不足ヘッダーを追加
+            next_col = len(current_headers) + 1
+            for i, h in enumerate(missing):
+                ws.update_cell(1, next_col + i, h)
+            print(f"  案件マスタに列を追加しました: {missing}")
 
     # ②工種別金額
     if SHEET_TRADES not in existing:
@@ -364,40 +380,51 @@ def write_to_spreadsheet(data: dict):
             category_amounts[mapped] += t["amount"]
 
     # 工事項目フラグの取得
-    item_flags = data.get("construction_item_flags", {})
     from config import CONSTRUCTION_ITEM_FLAGS
-    flag_values = [str(item_flags.get(key, False)) for key, _ in CONSTRUCTION_ITEM_FLAGS]
+    item_flags = data.get("construction_item_flags", {})
+    flag_dict = {label: str(item_flags.get(key, False)) for key, label in CONSTRUCTION_ITEM_FLAGS}
 
     # ── ①案件マスタ に書き込み ──
-    master_row = [
-        project_id,
-        data.get("project_name", ""),
-        data.get("brand", ""),
-        data.get("category", ""),
-        "",  # 工事種別（手入力: 新装/改装）
-        tsubo or "",
-        construction_date,
-        data.get("prefecture", ""),
-        data.get("station", ""),
-        total or "",  # 合計金額
-        category_amounts["内装"],
-        category_amounts["電気"],
-        category_amounts["給排水衛生"],
-        category_amounts["空調換気"],
-        category_amounts["ガス"],
-        category_amounts["看板"],
-        "",  # 客席数（手入力）
-        "",  # 厨房有無（手入力）
-        "",  # ドライブURL（手入力）
-        *flag_values,  # 工事項目フラグ5列
-        "",  # 入札結果（手入力）
-        "",  # 他社受注金額（手入力）
-        "",  # 他社受注坪単価（自動計算）
-        data.get("outdoor_unit_floor", ""),   # 室外機設置階数
-        data.get("construction_days", ""),     # 工期（日数）
-        data.get("construction_area", ""),     # 施工エリア
-        data.get("remarks_extra", ""),         # その他備考
-    ]
+    # ヘッダー名で列を特定して書き込む（列順のズレを防ぐ）
+    master_headers = ws_master.row_values(1)
+
+    master_data = {
+        "案件ID": project_id,
+        "案件名": data.get("project_name", ""),
+        "ブランド名": data.get("brand", ""),
+        "業態": data.get("category", ""),
+        "工事種別": "",
+        "坪数": tsubo or "",
+        "施工年月": construction_date,
+        "都道府県": data.get("prefecture", ""),
+        "最寄り駅": data.get("station", ""),
+        "合計金額（税抜）": total or "",
+        "内装": category_amounts["内装"],
+        "電気": category_amounts["電気"],
+        "給排水衛生": category_amounts["給排水衛生"],
+        "空調換気": category_amounts["空調換気"],
+        "ガス": category_amounts["ガス"],
+        "看板": category_amounts["看板"],
+        "客席数": "",
+        "厨房有無": "",
+        "ドライブURL": "",
+        **flag_dict,
+        "入札結果": "",
+        "他社受注金額": "",
+        "他社受注坪単価": "",
+        "室外機設置階数": data.get("outdoor_unit_floor", ""),
+        "工期（日数）": data.get("construction_days", ""),
+        "施工エリア": data.get("construction_area", ""),
+        "その他備考": data.get("remarks_extra", ""),
+    }
+
+    if master_headers:
+        # 既存ヘッダーに合わせて行を構築
+        master_row = [master_data.get(h, "") for h in master_headers]
+    else:
+        # ヘッダーがない場合はデフォルト順序
+        master_row = list(master_data.values())
+
     ws_master.append_row(master_row, value_input_option="USER_ENTERED")
     print(f"  → 案件マスタに書き込み完了（{project_id}）")
 
