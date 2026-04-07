@@ -715,8 +715,16 @@ if page == "PDF抽出":
                     choices = _cfg.GYOTAI_OPTIONS
 
                 cond = conditions_raw.get(key, {})
-                val = cond.get("value", "")
-                conf = cond.get("confidence", "low")
+                # GPT-4oが文字列で直接返した場合も対応
+                if isinstance(cond, dict):
+                    val = cond.get("value", "")
+                    conf = cond.get("confidence", "low")
+                elif isinstance(cond, str):
+                    val = cond
+                    conf = "medium"
+                else:
+                    val = ""
+                    conf = "low"
 
                 # confidence=low の場合は value を空に
                 if conf == "low":
