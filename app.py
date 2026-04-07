@@ -582,6 +582,26 @@ if st.sidebar.button("更新", use_container_width=True):
 
 st.sidebar.markdown("---")
 st.sidebar.markdown(f'<a class="sb-link" href="{SPREADSHEET_URL}" target="_blank">スプレッドシートを開く &#8599;</a>', unsafe_allow_html=True)
+
+# シート再構築ボタン（経験者向け）
+with st.sidebar.expander("⚙️ 管理機能"):
+    st.markdown('<div style="font-size:0.75rem;color:#888;margin-bottom:8px">スプレッドシートの全シートを削除して正しいヘッダー構成で再作成します。既存データは全て削除されます。</div>', unsafe_allow_html=True)
+    if st.button("🗑️ シートを再構築する", use_container_width=True, key="rebuild_sheets_btn"):
+        if st.session_state.get("rebuild_confirm"):
+            with st.spinner("シートを再構築中..."):
+                try:
+                    import rebuild_sheets
+                    rebuild_sheets.rebuild()
+                    _count_incomplete.clear()
+                    load_spreadsheet_data.clear()
+                    st.success("再構築完了！全シートを正しいヘッダーで作成しました。")
+                    st.session_state.rebuild_confirm = False
+                except Exception as e:
+                    st.error(f"エラー: {e}")
+        else:
+            st.session_state.rebuild_confirm = True
+            st.warning("❗ 全データが削除されます。もう一度ボタンを押すと実行します。")
+
 st.sidebar.markdown('<div class="sb-footer">GPT-4o + Google Sheets で構築</div>', unsafe_allow_html=True)
 
 
