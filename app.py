@@ -590,17 +590,28 @@ with st.sidebar.expander("⚙️ 管理機能"):
         if st.session_state.get("rebuild_confirm"):
             with st.spinner("シートを再構築中..."):
                 try:
-                    import rebuild_sheets
+                    import importlib, rebuild_sheets
+                    importlib.reload(rebuild_sheets)
                     rebuild_sheets.rebuild()
                     _count_incomplete.clear()
                     load_spreadsheet_data.clear()
                     st.success("再構築完了！全シートを正しいヘッダーで作成しました。")
                     st.session_state.rebuild_confirm = False
                 except Exception as e:
-                    st.error(f"エラー: {e}")
+                    import traceback
+                    st.error(f"エラー詳細: {type(e).__name__}: {e}")
+                    st.code(traceback.format_exc())
         else:
             st.session_state.rebuild_confirm = True
             st.warning("❗ 全データが削除されます。もう一度ボタンを押すと実行します。")
+    # デバッグ用: 現在のシート一覧を表示
+    if st.button("📋 現在のシート一覧", use_container_width=True, key="list_sheets_btn"):
+        try:
+            sh = ata_compare.get_spreadsheet()
+            titles = [ws.title for ws in sh.worksheets()]
+            st.info(f"シート: {titles}")
+        except Exception as e:
+            st.error(f"取得失敗: {e}")
 
 st.sidebar.markdown('<div class="sb-footer">GPT-4o + Google Sheets で構築</div>', unsafe_allow_html=True)
 
