@@ -23,6 +23,16 @@ from config import BID_RESULT_OPTIONS
 
 SHEET_CONDITIONS = "案件サマリー"
 
+
+def _col_letter(n: int) -> str:
+    """1-indexed列番号をアルファベット表記に変換（AA、ABなどにも対応）"""
+    result = ""
+    while n > 0:
+        n, r = divmod(n - 1, 26)
+        result = chr(65 + r) + result
+    return result
+
+
 TRADES_HEADERS = [
     "案件ID", "案件名", "業態", "坪数", "工種",
     "金額（税抜）", "坪単価",
@@ -99,13 +109,13 @@ def rebuild():
             print(f"  既存シートをクリア: {title}")
             ws.clear()
             ws.append_row(headers)
-            ws.format(f"A1:{chr(64 + len(headers))}1", {"textFormat": {"bold": True}})
+            ws.format(f"A1:{_col_letter(len(headers))}1", {"textFormat": {"bold": True}})
         else:
             # 新規作成
             print(f"  新規作成: {title}")
             ws = sh.add_worksheet(title=title, rows=spec["rows"], cols=cols)
             ws.append_row(headers)
-            ws.format(f"A1:{chr(64 + len(headers))}1", {"textFormat": {"bold": True}})
+            ws.format(f"A1:{_col_letter(len(headers))}1", {"textFormat": {"bold": True}})
 
         # 案件マスタ固有の設定
         if spec["extra_setup"] == "master":

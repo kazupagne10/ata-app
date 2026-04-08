@@ -249,6 +249,15 @@ def get_gspread_client() -> gspread.Client:
     ]
     creds = get_google_credentials(scopes)
     return gspread.authorize(creds)
+
+
+def _col_letter(n: int) -> str:
+    """1-indexed列番号をアルファベット表記に変換（AA、ABなどにも対応）"""
+    result = ""
+    while n > 0:
+        n, r = divmod(n - 1, 26)
+        result = chr(65 + r) + result
+    return result
 def _set_dropdown_validation(sh: gspread.Spreadsheet, sheet_id: int, col_index: int, values: list[str]):
     """指定列にプルダウン（データ検証）を設定する"""
     sh.batch_update({"requests": [{
@@ -293,7 +302,7 @@ def ensure_sheets(sh: gspread.Spreadsheet):
     if SHEET_MASTER not in existing:
         ws = sh.add_worksheet(title=SHEET_MASTER, rows=200, cols=len(MASTER_HEADERS) + 5)
         ws.append_row(MASTER_HEADERS)
-        ws.format(f"A1:{chr(64 + len(MASTER_HEADERS))}1", {"textFormat": {"bold": True}})
+        ws.format(f"A1:{_col_letter(len(MASTER_HEADERS))}1", {"textFormat": {"bold": True}})
         # 工事種別列（E列）にデータ検証（新装/改装のプルダウン）を設定
         _set_dropdown_validation(sh, ws.id, col_index=4, values=["新装", "改装"])
         # 入札結果列にプルダウン設定
